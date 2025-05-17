@@ -56,14 +56,31 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Lombok (recomendado para POJOs) -->
+        <!-- Requerido para conexiones con TCPS y Oracle Wallet -->
+        <dependency>
+            <groupId>com.oracle.database.security</groupId>
+            <artifactId>oraclepki</artifactId>
+            <version>21.9.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle.database.security</groupId>
+            <artifactId>osdt_core</artifactId>
+            <version>21.9.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle.database.security</groupId>
+            <artifactId>osdt_cert</artifactId>
+            <version>21.9.0.0</version>
+        </dependency>
+
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
 
-        <!-- DevTools (hot reload) -->
+        <!-- DevTools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -76,6 +93,7 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -98,7 +116,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Plugin de Spring Boot -->
+            <!-- Spring Boot Plugin -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -106,7 +124,6 @@
         </plugins>
     </build>
 
-    <!-- Repositorio Oracle JDBC -->
     <repositories>
         <repository>
             <id>oracle</id>
