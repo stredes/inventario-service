@@ -9,12 +9,18 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class MovimientoStock {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String tipo; // ENTRADA, SALIDA, RESERVA
+    @ManyToOne
+    @JoinColumn(name = "producto_id", nullable = false)
+    private Producto producto;
+
+    private String tipo; // ENTRADA, SALIDA, RESERV
     private String sku;
     private Integer cantidad;
     private String origen;

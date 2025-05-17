@@ -1,49 +1,55 @@
 package com.retailmax.inventario.service;
 
-import com.retailmax.inventario.entity.MovimientoStock;
-import com.retailmax.inventario.entity.Producto;
+import com.retailmax.inventario.model.MovimientoStock;
+import com.retailmax.inventario.model.Producto;
 import com.retailmax.inventario.repository.MovimientoStockRepository;
 import com.retailmax.inventario.repository.ProductoRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class MovimientoStockService {
 
-    private final MovimientoStockRepository movimientoRepo;
-    private final ProductoRepository productoRepo;
+    private final MovimientoStockRepository movimientoStockRepository;
+    private final ProductoRepository productoRepository;
 
-    public MovimientoStock registrarMovimiento(Long productoId, Integer cantidad, String tipo, String observacion) {
-        Producto producto = productoRepo.findById(productoId).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+    public MovimientoStockService(MovimientoStockRepository movimientoStockRepository, ProductoRepository productoRepository) {
+        this.movimientoStockRepository = movimientoStockRepository;
+        this.productoRepository = productoRepository;
+    }
 
-        if (tipo.equalsIgnoreCase("SALIDA") && producto.getStock() < cantidad) {
-            throw new RuntimeException("Stock insuficiente");
+    @Transactional
+    public void registrarMovimiento(String codigoProducto, String tipo, int cantidad) {
+        Producto producto = productoRepository.findByCodigo(codigoProducto);
+
+        if (producto == null) {
+            throw new IllegalArgumentException("Producto no encontrado: " + codigoProducto);
         }
 
-        if (tipo.equalsIgnoreCase("ENTRADA")) {
-            producto.setStock(producto.getStock() + cantidad);
-        } else if (tipo.equalsIgnoreCase("SALIDA")) {
-            producto.setStock(producto.getStock() - cantidad);
+        if ("SALIDA".equalsIgnoreCase(tipo) && producto.getStock() < cantidad) {
+            throw new IllegalArgumentException("Stock insuficiente para realizar la salida.");
         }
 
-        productoRepo.save(producto);
+        int nuevoStock = "ENTRADA".equalsIgnoreCase(tipo)
+                ? producto.getStock() + cantidad
+                : producto.getStock() - cantidad;
 
-        MovimientoStock mov = MovimientoStock.builder()
-                .producto(producto)
-                .cantidad(cantidad)
-                .tipo(tipo.toUpperCase())
-                .fecha(LocalDateTime.now())
-                .observacion(observacion)
-                .build();
+        producto.setStock(nuevoStock);
+        productoRepository.save(producto);
 
-        return movimientoRepo.save(mov);
+        MovimientoStock movimiento = new MovimientoStock();
+        movimiento.setProducto(producto);
+        movimiento.setTipo(tipo);
+        movimiento.setCantidad(cantidad);
+        movimiento.setFecha(LocalDateTime.now());
+
+        movimientoStockRepository.save(movimiento);
     }
 
     public List<MovimientoStock> listarMovimientos() {
-        return movimientoRepo.findAll();
+        return movimientoStockRepository.findAll();
     }
 }
