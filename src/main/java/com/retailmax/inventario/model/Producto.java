@@ -8,12 +8,14 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Stock {
+public class Producto {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String sku;
+    private String codigo;
+    private String nombre;
+    private int stock;
     private String ubicacion;
-    private Integer cantidad;
 }
